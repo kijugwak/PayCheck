@@ -19,7 +19,7 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
-
+    //test
     EditText editTextSalary;
     TextView textViewHourlyWage;
     TextView textViewDailyEarning;
