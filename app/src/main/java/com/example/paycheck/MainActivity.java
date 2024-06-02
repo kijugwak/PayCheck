@@ -2,7 +2,6 @@ package com.example.paycheck;
 
 import android.app.TimePickerDialog;
 import android.content.SharedPreferences;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -118,27 +117,26 @@ public class MainActivity extends AppCompatActivity {
 
         handler.post(updateEarningRunnable);
     }
-// 한시간단위로 알림
-//    private void scheduleNotification() {
-//        // AlarmManager를 사용하여 시간 단위 알림 예약
-//        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-//        Calendar now = Calendar.getInstance();
-//        now.set(Calendar.MINUTE, 0); // 현재 분을 0으로 설정하여 정각에 알림이 트리거되도록 함
-//        now.set(Calendar.SECOND, 0); // 현재 초를 0으로 설정하여 정각에 알림이 트리거되도록 함
-//        now.set(Calendar.MILLISECOND, 0);
-//
-//        // 정각에 알림을 예약하기 위해 현재 시간에서 1시간을 더하고 분과 초를 0으로 설정
-//        now.add(Calendar.HOUR_OF_DAY, 1);
-//
-//        // 알림을 위한 PendingIntent 생성
-//        Intent intent = new Intent(this, NotificationReceiver.class);
-//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
-//
-//        // AlarmManager를 사용하여 정각에 알림 예약
-//        if (alarmManager != null) {
-//            alarmManager.setExact(AlarmManager.RTC_WAKEUP, now.getTimeInMillis(), pendingIntent);
-//        }
-//    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // SharedPreferences에서 저장된 출근 시간과 연봉을 불러옴
+        loadPreferences();
+
+        // 현재까지의 수입
+        resetDailyEarning(); // 현재까지의 수입 초기화
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // SharedPreferences에 출근 시간과 연봉을 저장
+        savePreferences();
+    }
+
     private void scheduleNotification() {
         // AlarmManager를 사용하여 30초마다 알림 예약
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -205,7 +203,14 @@ public class MainActivity extends AppCompatActivity {
         int currentHour = now.get(Calendar.HOUR_OF_DAY);
         int currentMinute = now.get(Calendar.MINUTE);
 
-        if (startHour != 0 && currentHour > startHour || (currentHour == endHour && currentMinute > endMinute)) {
+        // 선택한 출근 시간에 9시간을 더한 시간
+        Calendar startCalendar = Calendar.getInstance();
+        startCalendar.set(Calendar.HOUR_OF_DAY, startHour + 9); // 선택한 출근 시간에 9시간을 더함
+        startCalendar.set(Calendar.MINUTE, startMinute);
+
+        // 현재 시간과 선택한 출근 시간에 9시간을 더한 시간을 비교하여 메시지 표시 여부 결정
+        if (now.compareTo(startCalendar) >= 0 && currentHour < endHour || (currentHour == endHour && currentMinute <= endMinute)) {
+            // 현재 시간이 출근 시간 이후이며 퇴근 시간 이전인 경우에만 메시지 추가
             formattedDailyEarning += "\n오늘 하루도 고생했어요!";
             // 디버깅을 위해 메시지가 추가되는지 확인합니다.
             System.out.println("오늘 하루도 고생했어요! 메시지가 추가되었습니다.");
@@ -224,6 +229,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt("startMinute", startMinute);
         editor.putInt("endHour", endHour);
         editor.putInt("endMinute", endMinute);
+        editor.putFloat("salary", (float) salary);
         editor.apply();
     }
 
@@ -233,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
         startMinute = preferences.getInt("startMinute", 0);
         endHour = preferences.getInt("endHour", 18);
         endMinute = preferences.getInt("endMinute", 0);
+        salary = preferences.getFloat("salary", 0);
 
         // 저장된 출근 시간이 있으면 연봉 입력을 활성화
         if (startHour != 9 || startMinute != 0 || endHour != 18 || endMinute != 0) {
@@ -244,3 +251,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
+
