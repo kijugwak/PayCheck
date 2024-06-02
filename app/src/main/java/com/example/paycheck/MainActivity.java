@@ -161,16 +161,30 @@ public class MainActivity extends AppCompatActivity {
         int currentHour = now.get(Calendar.HOUR_OF_DAY);
         int currentMinute = now.get(Calendar.MINUTE);
 
-        double elapsedTimeInSeconds = (now.getTimeInMillis() - startTimeInMillis) / 1000.0; // 출근 시간부터 경과한 시간(초)
-        double workingTimeInSeconds = (currentHour - startHour) * 3600 + (currentMinute - startMinute) * 60; // 현재까지의 근무 시간(초)
-        double earnedSinceStart = hourlySalary * (elapsedTimeInSeconds / 3600.0); // 출근 시간부터 현재까지의 수입
-        if ((earnedSinceStart + hourlySalary * (workingTimeInSeconds / 3600.0)) < 0){
-            return (earnedSinceStart + hourlySalary * -(workingTimeInSeconds / 3600.0));
-        } else{
+        // 출근 시간부터 경과한 시간(초)
+        double elapsedTimeInSeconds = (now.getTimeInMillis() - startTimeInMillis) / 1000.0;
+
+        // 현재까지의 근무 시간(초)
+        double workingTimeInSeconds = (currentHour - startHour) * 3600 + (currentMinute - startMinute) * 60;
+
+        // 경과 시간과 근무 시간을 9시간(32400초)으로 제한
+        double maxWorkingTimeInSeconds = 9 * 3600.0; // 9시간을 초로 변환
+        elapsedTimeInSeconds = Math.min(elapsedTimeInSeconds, maxWorkingTimeInSeconds);
+        workingTimeInSeconds = Math.min(workingTimeInSeconds, maxWorkingTimeInSeconds);
+
+        // 출근 시간부터 현재까지의 수입 계산
+        double earnedSinceStart = hourlySalary * (elapsedTimeInSeconds / 3600.0);
+
+        // 수입이 음수인 경우를 처리
+        if ((earnedSinceStart + hourlySalary * (workingTimeInSeconds / 3600.0)) < 0) {
+            return earnedSinceStart + hourlySalary * -(workingTimeInSeconds / 3600.0);
+        } else {
             // 출근 시간부터의 수입에 현재까지의 근무 시간 동안의 수입을 추가하여 반환
             return earnedSinceStart + hourlySalary * (workingTimeInSeconds / 3600.0);
         }
     }
+
+
 
     private void resetDailyEarning() {
         dailyEarning = 0;
@@ -214,6 +228,7 @@ public class MainActivity extends AppCompatActivity {
             formattedDailyEarning += "\n오늘 하루도 고생했어요!";
             // 디버깅을 위해 메시지가 추가되는지 확인합니다.
             System.out.println("오늘 하루도 고생했어요! 메시지가 추가되었습니다.");
+            onStop();
         } else {
             // 디버깅을 위해 조건이 맞지 않는 경우를 출력합니다.
             System.out.println("퇴근 시간이 지나지 않았습니다.");
