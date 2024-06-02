@@ -80,7 +80,7 @@
                                               <map>
                                                 <entry key="color" value="000000" />
                                                 <entry key="imagePath" value="$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/app_logo.JPG" />
-                                                <entry key="scalingPercent" value="118" />
+                                                <entry key="scalingPercent" value="120" />
                                               </map>
                                             </option>
                                           </PersistentState>
