@@ -110,8 +110,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 try {
-                    salary = Double.parseDouble(s.toString()) * 10000; // 만원 단위 입력을 원 단위로 변환
-                    updateHourlyWage();
+                    if (s.toString().isEmpty()) {
+                        salary = 0;
+                        textViewHourlyWage.setText("시급: ");
+                        textViewDailyEarning.setText("오늘 번 돈: 0 원");
+                    } else {
+                        salary = Double.parseDouble(s.toString()) * 10000; // 만원 단위 입력을 원 단위로 변환
+                        updateHourlyWage();
+                    }
                 } catch (NumberFormatException e) {
                     salary = 0;
                     textViewHourlyWage.setText("시급: ");
