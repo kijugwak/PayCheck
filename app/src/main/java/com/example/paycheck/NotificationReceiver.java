@@ -16,9 +16,10 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         // 알림 채널 생성 (Android 8.0 이상에서 필요)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("default", "Channel name", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel("default", "Channel name", NotificationManager.IMPORTANCE_HIGH); // 중요도를 IMPORTANCE_HIGH로 설정
             notificationManager.createNotificationChannel(channel);
         }
+
 
         // 알림 생성 및 표시
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "default")

@@ -2,6 +2,7 @@ package com.example.paycheck;
 
 import android.app.TimePickerDialog;
 import android.content.SharedPreferences;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -117,24 +118,39 @@ public class MainActivity extends AppCompatActivity {
 
         handler.post(updateEarningRunnable);
     }
-
+// 한시간단위로 알림
+//    private void scheduleNotification() {
+//        // AlarmManager를 사용하여 시간 단위 알림 예약
+//        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+//        Calendar now = Calendar.getInstance();
+//        now.set(Calendar.MINUTE, 0); // 현재 분을 0으로 설정하여 정각에 알림이 트리거되도록 함
+//        now.set(Calendar.SECOND, 0); // 현재 초를 0으로 설정하여 정각에 알림이 트리거되도록 함
+//        now.set(Calendar.MILLISECOND, 0);
+//
+//        // 정각에 알림을 예약하기 위해 현재 시간에서 1시간을 더하고 분과 초를 0으로 설정
+//        now.add(Calendar.HOUR_OF_DAY, 1);
+//
+//        // 알림을 위한 PendingIntent 생성
+//        Intent intent = new Intent(this, NotificationReceiver.class);
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+//
+//        // AlarmManager를 사용하여 정각에 알림 예약
+//        if (alarmManager != null) {
+//            alarmManager.setExact(AlarmManager.RTC_WAKEUP, now.getTimeInMillis(), pendingIntent);
+//        }
+//    }
     private void scheduleNotification() {
-        // AlarmManager를 사용하여 정각에 알림 예약
+        // AlarmManager를 사용하여 30초마다 알림 예약
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Calendar now = Calendar.getInstance();
-        now.set(Calendar.SECOND, 0); // 현재 초를 0으로 설정하여 정각에 알림이 트리거되도록 함
-        now.set(Calendar.MILLISECOND, 0);
-
-        // 정각에 알림을 예약하기 위해 현재 시간에서 1시간을 더하고 분과 초를 0으로 설정
-        now.add(Calendar.HOUR_OF_DAY, 1);
+        long intervalMillis = 30 * 1000; // 30초 간격 (밀리초 단위)
 
         // 알림을 위한 PendingIntent 생성
         Intent intent = new Intent(this, NotificationReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
-        // AlarmManager를 사용하여 정각에 알림 예약
+        // AlarmManager를 사용하여 30초 간격으로 알림 예약
         if (alarmManager != null) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, now.getTimeInMillis(), pendingIntent);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), intervalMillis, pendingIntent);
         }
     }
 
