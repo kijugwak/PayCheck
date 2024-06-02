@@ -10,7 +10,7 @@
         android:id="@+id/splash_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/paycheck_logo"
+        android:src="@drawable/splash_page"
         android:contentDescription="@string/splash_logo_description"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
