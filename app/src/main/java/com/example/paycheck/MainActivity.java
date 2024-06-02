@@ -27,15 +27,16 @@ public class MainActivity extends AppCompatActivity {
     double salary = 0;
     double dailyEarning = 0;
     double hourlySalary = 0;
+    public String formattedDailyEarning;
 
     final double taxRate = 0.033; // 세금 비율 (3.3%)
     final int workDaysPerWeek = 5; // 주당 근무일 수
     final int workHoursPerDay = 9; // 하루 근무 시간
 
-    int startHour = 0;
-    int startMinute = 0;
-    int endHour = 0;
-    int endMinute = 0;
+    Integer startHour = null;
+    Integer startMinute = null;
+    Integer endHour = null;
+    Integer endMinute = null;
 
     Handler handler = new Handler();
     Runnable updateEarningRunnable = new Runnable() {
@@ -45,13 +46,15 @@ public class MainActivity extends AppCompatActivity {
             int currentHour = now.get(Calendar.HOUR_OF_DAY);
             int currentMinute = now.get(Calendar.MINUTE);
 
-            if ((currentHour > startHour && currentHour < endHour) ||
-                    (currentHour == startHour && currentMinute >= startMinute) ||
-                    (currentHour == endHour && currentMinute <= endMinute)) {
+            if (startHour != null && startMinute != null &&
+                    ((currentHour > startHour && currentHour < endHour) ||
+                            (currentHour == startHour && currentMinute >= startMinute) ||
+                            (currentHour == endHour && currentMinute <= endMinute))) {
                 dailyEarning += hourlySalary / 3600; // 초 단위로 증가
                 updateDailyEarning();
                 handler.postDelayed(this, 1000); // 1초마다 돈이 올라가도록 설정
-            } else if (currentHour == endHour && currentMinute > endMinute) {
+            } else if (startHour != null && startMinute != null &&
+                    currentHour == endHour && currentMinute > endMinute) {
                 // 근무 시간이 끝났을 때 핸들러를 중지합니다.
                 handler.removeCallbacks(this);
             }
@@ -71,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
         textViewDailyEarning = findViewById(R.id.textViewDailyEarning);
         buttonStartTime = findViewById(R.id.buttonStartTime);
 
+        buttonStartTime.setText("출근시간 정하기");
+
         buttonStartTime.setOnClickListener(v -> {
             TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this, (view, hourOfDay, minute) -> {
                 startHour = hourOfDay;
@@ -86,7 +91,10 @@ public class MainActivity extends AppCompatActivity {
                 resetDailyEarning();
                 updateHourlyWage(); // 시급 업데이트
                 handler.post(updateEarningRunnable); // Runnable 시작
-            }, startHour, startMinute, true);
+
+                // 출근 시간 버튼 텍스트 업데이트
+                buttonStartTime.setText(String.format("출근시간 : %02d:%02d", startHour, startMinute));
+            }, startHour != null ? startHour : 0, startMinute != null ? startMinute : 0, true);
             timePickerDialog.show();
         });
 
@@ -184,8 +192,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
     private void resetDailyEarning() {
         dailyEarning = 0;
         updateDailyEarning(); // 수입을 초기화 후 바로 화면에 반영
@@ -209,61 +215,65 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateDailyEarning() {
-        double earningSinceStartTime = calculateEarningSinceStartTime(); // 출근 시간부터의 수입 계산
-        DecimalFormat decimalFormat = new DecimalFormat("#,##0 원");
-        String formattedDailyEarning = "오늘 번 돈: " + decimalFormat.format(earningSinceStartTime);
+        if (startHour != null && startMinute != null) {
+            double earningSinceStartTime = calculateEarningSinceStartTime(); // 출근 시간부터의 수입 계산
+            DecimalFormat decimalFormat = new DecimalFormat("#,##0 원");
+            formattedDailyEarning = "오늘 번 돈: " + decimalFormat.format(earningSinceStartTime);
 
-        Calendar now = Calendar.getInstance();
-        int currentHour = now.get(Calendar.HOUR_OF_DAY);
-        int currentMinute = now.get(Calendar.MINUTE);
+            Calendar now = Calendar.getInstance();
 
-        // 선택한 출근 시간에 9시간을 더한 시간
-        Calendar startCalendar = Calendar.getInstance();
-        startCalendar.set(Calendar.HOUR_OF_DAY, startHour + 9); // 선택한 출근 시간에 9시간을 더함
-        startCalendar.set(Calendar.MINUTE, startMinute);
+            // 선택한 출근 시간에 9시간을 더한 시간
+            Calendar startCalendar = Calendar.getInstance();
+            startCalendar.set(Calendar.HOUR_OF_DAY, startHour);
+            startCalendar.set(Calendar.MINUTE, startMinute);
+            startCalendar.add(Calendar.HOUR_OF_DAY, 9); // 선택한 출근 시간에 9시간을 더함
 
-        // 현재 시간과 선택한 출근 시간에 9시간을 더한 시간을 비교하여 메시지 표시 여부 결정
-        if (now.compareTo(startCalendar) >= 0 && currentHour < endHour || (currentHour == endHour && currentMinute <= endMinute)) {
-            // 현재 시간이 출근 시간 이후이며 퇴근 시간 이전인 경우에만 메시지 추가
-            formattedDailyEarning += "\n오늘 하루도 고생했어요!";
-            // 디버깅을 위해 메시지가 추가되는지 확인합니다.
-            System.out.println("오늘 하루도 고생했어요! 메시지가 추가되었습니다.");
-            onStop();
+            // 현재 시간과 선택한 출근 시간에 9시간을 더한 시간을 비교하여 메시지 표시 여부 결정
+            if (now.compareTo(startCalendar) >= 0) {
+                // 현재 시간이 출근 시간 이후 9시간이 지난 경우 메시지 추가
+                formattedDailyEarning += "\n오늘 하루도 고생했어요!";
+                // 디버깅을 위해 메시지가 추가되는지 확인합니다.
+                System.out.println("오늘 하루도 고생했어요! 메시지가 추가되었습니다.");
+                onStop();
+            } else {
+                // 디버깅을 위해 조건이 맞지 않는 경우를 출력합니다.
+                System.out.println("퇴근 시간이 지나지 않았습니다.");
+            }
+
+            textViewDailyEarning.setText(formattedDailyEarning);
         } else {
-            // 디버깅을 위해 조건이 맞지 않는 경우를 출력합니다.
-            System.out.println("퇴근 시간이 지나지 않았습니다.");
+            textViewDailyEarning.setText("출근 시간을 설정하세요.");
         }
-
-        textViewDailyEarning.setText(formattedDailyEarning);
     }
 
     private void savePreferences() {
         SharedPreferences preferences = getSharedPreferences("work_preferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("startHour", startHour);
-        editor.putInt("startMinute", startMinute);
-        editor.putInt("endHour", endHour);
-        editor.putInt("endMinute", endMinute);
+        if (startHour != null && startMinute != null) {
+            editor.putInt("startHour", startHour);
+            editor.putInt("startMinute", startMinute);
+            editor.putInt("endHour", endHour);
+            editor.putInt("endMinute", endMinute);
+        }
         editor.putFloat("salary", (float) salary);
         editor.apply();
     }
 
     private void loadPreferences() {
         SharedPreferences preferences = getSharedPreferences("work_preferences", MODE_PRIVATE);
-        startHour = preferences.getInt("startHour", 9);
-        startMinute = preferences.getInt("startMinute", 0);
-        endHour = preferences.getInt("endHour", 18);
-        endMinute = preferences.getInt("endMinute", 0);
-        salary = preferences.getFloat("salary", 0);
+        if (preferences.contains("startHour") && preferences.contains("startMinute")) {
+            startHour = preferences.getInt("startHour", 9);
+            startMinute = preferences.getInt("startMinute", 0);
+            endHour = preferences.getInt("endHour", 18);
+            endMinute = preferences.getInt("endMinute", 0);
+            salary = preferences.getFloat("salary", 0);
 
-        // 저장된 출근 시간이 있으면 연봉 입력을 활성화
-        if (startHour != 9 || startMinute != 0 || endHour != 18 || endMinute != 0) {
+            // 저장된 출근 시간이 있으면 연봉 입력을 활성화
             editTextSalary.setEnabled(true);
-            buttonStartTime.setText(String.format("%02d:%02d 출근", startHour, startMinute));
+            buttonStartTime.setText(String.format("출근시간 : %02d:%02d", startHour, startMinute));
             editTextSalary.requestFocus();
             setStartTime(); // 출근 시작 시간 설정
             updateHourlyWage(); // 시급 업데이트
         }
     }
 }
-
