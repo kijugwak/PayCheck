@@ -9,9 +9,19 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main"
-        android:layout_width="300dp"
-        android:layout_height="350dp"
+        android:layout_width="409dp"
+        android:layout_height="725dp"
         android:layout_centerInParent="true">
+
+        <!-- ImageView를 ConstraintLayout의 상단에 배치 -->
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="0dp"
+            android:layout_height="208dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/paycheck_main_logo" />
 
         <EditText
             android:id="@+id/editTextSalary"
@@ -20,14 +30,14 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
+            android:gravity="center"
             android:hint="연봉을 입력하세요 (만원)"
             android:inputType="numberDecimal"
             android:minHeight="48dp"
             android:textColorHint="@color/black"
-            android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/imageView2" />
 
 
         <Button
@@ -70,13 +80,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="68dp"
+            android:gravity="center"
             android:text="돈에 관한 명언"
             android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.491"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewDailyEarning"
-            android:gravity="center"/>
+            app:layout_constraintTop_toBottomOf="@+id/textViewDailyEarning" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
