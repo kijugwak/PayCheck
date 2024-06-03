@@ -255,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
     private void resetDailyEarning() {
         dailyEarning = 0;
         updateDailyEarning(); // 수입을 초기화 후 바로 화면에 반영
+        handler.post(updateEarningRunnable); // Runnable 다시 시작
     }
 
     private void updateHourlyWage() {
@@ -353,6 +354,8 @@ public class MainActivity extends AppCompatActivity {
 
             // 현재 번 돈을 화면에 반영
             updateDailyEarning();
+            handler.post(updateEarningRunnable); // Runnable 시작
         }
     }
+
 }
