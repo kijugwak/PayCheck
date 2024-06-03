@@ -68,7 +68,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        scheduleNotification();
+        //알림설정
+//        scheduleNotification();
         editTextSalary = findViewById(R.id.editTextSalary);
         textViewHourlyWage = findViewById(R.id.textViewHourlyWage);
         textViewDailyEarning = findViewById(R.id.textViewDailyEarning);
