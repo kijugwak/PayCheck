@@ -102,9 +102,6 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        // 첫 번째 명언 업데이트 시작
-        handler.post(updateQuoteRunnable);
-
         editTextSalary = findViewById(R.id.editTextSalary);
         textViewHourlyWage = findViewById(R.id.textViewHourlyWage);
         textViewDailyEarning = findViewById(R.id.textViewDailyEarning);
