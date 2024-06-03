@@ -18,6 +18,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 
+import java.util.Random;
+
+
 public class MainActivity extends AppCompatActivity {
     EditText editTextSalary;
     TextView textViewHourlyWage;
@@ -74,7 +77,16 @@ public class MainActivity extends AppCompatActivity {
         textViewHourlyWage = findViewById(R.id.textViewHourlyWage);
         textViewDailyEarning = findViewById(R.id.textViewDailyEarning);
         buttonStartTime = findViewById(R.id.buttonStartTime);
+        // 명언을 표시할 TextView 찾기
+        TextView textViewQuote = findViewById(R.id.textViewQuote);
 
+        // 랜덤한 명언 선택
+        MoneyQuote[] quotes = MoneyQuote.values();
+        Random random = new Random();
+        MoneyQuote randomQuote = quotes[random.nextInt(quotes.length)];
+
+        // 선택된 명언을 TextView에 설정
+        textViewQuote.setText(randomQuote.getQuote());
         buttonStartTime.setText("출근시간 정하기");
 
         buttonStartTime.setOnClickListener(v -> {
