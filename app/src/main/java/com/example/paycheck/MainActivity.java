@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 수입이 음수인 경우를 처리
         if ((earnedSinceStart + hourlySalary * (workingTimeInSeconds / 3600.0)) < 0) {
-            return earnedSinceStart + hourlySalary * -(workingTimeInSeconds / 3600.0);
+            return 0;
         } else {
             // 출근 시간부터의 수입에 현재까지의 근무 시간 동안의 수입을 추가하여 반환
             return earnedSinceStart + hourlySalary * (workingTimeInSeconds / 3600.0);
