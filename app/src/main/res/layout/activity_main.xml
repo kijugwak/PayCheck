@@ -24,9 +24,11 @@
             android:inputType="numberDecimal"
             android:minHeight="48dp"
             android:textColorHint="@color/black"
+            android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
 
         <Button
             android:id="@+id/buttonStartTime"
