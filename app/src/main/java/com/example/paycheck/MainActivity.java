@@ -115,6 +115,9 @@ public class MainActivity extends AppCompatActivity {
                         salary = 0;
                         textViewHourlyWage.setText("시급: ");
                         textViewDailyEarning.setText("오늘 번 돈: 0 원");
+
+                        // 연봉이 변경되었으므로 현재까지의 수입을 초기화하고 다시 계산
+                        resetDailyEarning();
                     } else {
                         salary = Double.parseDouble(s.toString()) * 10000; // 만원 단위 입력을 원 단위로 변환
                         updateHourlyWage();
@@ -123,13 +126,12 @@ public class MainActivity extends AppCompatActivity {
                     salary = 0;
                     textViewHourlyWage.setText("시급: ");
                     textViewDailyEarning.setText("오늘 번 돈: 0 원"); // 연봉이 없는 경우 오늘 번 돈을 0으로 설정
-                }
 
-                // 연봉이 변경되었으므로 현재까지의 수입을 초기화하고 다시 계산
-                resetDailyEarning();
+                    // 연봉이 변경되었으므로 현재까지의 수입을 초기화하고 다시 계산
+                    resetDailyEarning();
+                }
             }
         });
-
         handler.post(updateEarningRunnable);
     }
 
@@ -225,7 +227,11 @@ public class MainActivity extends AppCompatActivity {
         if (startHour != null && startMinute != null) {
             double earningSinceStartTime = calculateEarningSinceStartTime(); // 출근 시간부터의 수입 계산
             DecimalFormat decimalFormat = new DecimalFormat("#,##0 원");
-            formattedDailyEarning = "오늘 번 돈: " + decimalFormat.format(earningSinceStartTime);
+            if (editTextSalary != null){
+                formattedDailyEarning = "오늘 번 돈: " + decimalFormat.format(earningSinceStartTime);
+            } else {
+                formattedDailyEarning = "오늘 번 돈: 0 원";
+            }
 
             Calendar now = Calendar.getInstance();
 
@@ -249,9 +255,11 @@ public class MainActivity extends AppCompatActivity {
 
             textViewDailyEarning.setText(formattedDailyEarning);
         } else {
-            textViewDailyEarning.setText("출근 시간을 설정하세요.");
+            // 연봉을 입력하지 않은 경우 오늘 번 돈을 0원으로 설정합니다.
+            textViewDailyEarning.setText("오늘 번 돈: 0 원");
         }
     }
+
 
     private void savePreferences() {
         SharedPreferences preferences = getSharedPreferences("work_preferences", MODE_PRIVATE);
@@ -275,12 +283,18 @@ public class MainActivity extends AppCompatActivity {
             endMinute = preferences.getInt("endMinute", 0);
             salary = preferences.getFloat("salary", 0);
 
-            // 저장된 출근 시간이 있으면 연봉 입력을 활성화
-            editTextSalary.setEnabled(true);
+            // 저장된 출근 시간이 있으면 출근 시간 버튼에 텍스트 설정
             buttonStartTime.setText(String.format("출근시간 : %02d:%02d", startHour, startMinute));
-            editTextSalary.requestFocus();
             setStartTime(); // 출근 시작 시간 설정
-            updateHourlyWage(); // 시급 업데이트
+
+            // 시급을 업데이트합니다.
+            updateHourlyWage();
+
+            // 연봉이 저장되어 있는 경우 입력 칸에 설정
+            if (salary > 0) {
+                DecimalFormat decimalFormat = new DecimalFormat("#,##0");
+                editTextSalary.setText(decimalFormat.format(salary / 10000)); // 만원 단위로 변환하여 설정
+            }
         }
     }
 }
