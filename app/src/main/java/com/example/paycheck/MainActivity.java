@@ -79,19 +79,12 @@ public class MainActivity extends AppCompatActivity {
         // 명언을 표시할 TextView 찾기
         textViewQuote = findViewById(R.id.textViewQuote);
 
-        // 랜덤한 명언 선택
-        MoneyQuote[] quotes = MoneyQuote.values();
-        Random random = new Random();
-        MoneyQuote randomQuote = quotes[random.nextInt(quotes.length)];
-
-        // 선택된 명언을 TextView에 설정
-        textViewQuote.setText(randomQuote.getQuote());
+        // Handler 및 Runnable 초기화
         handler = new Handler();
-        // 10초마다 명언 변경을 위해 Runnable 설정
         Runnable updateQuoteRunnable = new Runnable() {
             @Override
             public void run() {
-                // 명언 변경
+                // 명언 업데이트
                 MoneyQuote[] quotes = MoneyQuote.values();
                 Random random = new Random();
                 MoneyQuote randomQuote = quotes[random.nextInt(quotes.length)];
@@ -102,25 +95,13 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        // 첫 번째 명언 업데이트 시작
+        handler.post(updateQuoteRunnable);
+
         editTextSalary = findViewById(R.id.editTextSalary);
         textViewHourlyWage = findViewById(R.id.textViewHourlyWage);
         textViewDailyEarning = findViewById(R.id.textViewDailyEarning);
         buttonStartTime = findViewById(R.id.buttonStartTime);
-        // 명언을 표시할 TextView 찾기
-        textViewQuote = findViewById(R.id.textViewQuote);
-        // Handler 및 Runnable 초기화
-        handler = new Handler();
-        updateQuoteRunnable = new Runnable() {
-            @Override
-            public void run() {
-                // 명언 업데이트
-                updateQuote();
-                // 10초 후에 다시 실행
-                handler.postDelayed(this, 10000);
-            }
-        };
-        // 명언 업데이트 시작
-        handler.post(updateQuoteRunnable);
 
         buttonStartTime.setOnClickListener(v -> {
             TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this, (view, hourOfDay, minute) -> {
@@ -184,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
         // 현재까지의 수입
         resetDailyEarning(); // 현재까지의 수입 초기화
     }
+
 
     @Override
     protected void onDestroy() {
