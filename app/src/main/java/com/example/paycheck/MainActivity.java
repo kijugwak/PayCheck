@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
             if (editTextSalary != null){
                 formattedDailyEarning = "오늘 번 돈: " + decimalFormat.format(earningSinceStartTime);
             } else {
-                formattedDailyEarning = "오늘 번 돈: 0 원";
+                formattedDailyEarning = "오늘 번 돈: " + 0;
             }
 
             Calendar now = Calendar.getInstance();
@@ -343,6 +343,8 @@ public class MainActivity extends AppCompatActivity {
             editor.putInt("endMinute", endMinute);
         }
         editor.putFloat("salary", (float) salary);
+        editor.putFloat("hourlySalary", (float) hourlySalary);
+        editor.putFloat("dailyEarning", (float) dailyEarning);
         editor.apply();
     }
 
@@ -354,6 +356,8 @@ public class MainActivity extends AppCompatActivity {
             endHour = preferences.getInt("endHour", 18);
             endMinute = preferences.getInt("endMinute", 0);
             salary = preferences.getFloat("salary", 0);
+            hourlySalary = preferences.getFloat("hourlySalary", 0);
+            dailyEarning = preferences.getFloat("dailyEarning", 0);
 
             // 저장된 출근 시간이 있으면 출근 시간 버튼에 텍스트 설정
             buttonStartTime.setText(String.format("출근시간 : %02d:%02d", startHour, startMinute));
@@ -367,6 +371,9 @@ public class MainActivity extends AppCompatActivity {
                 DecimalFormat decimalFormat = new DecimalFormat("#,##0");
                 editTextSalary.setText(decimalFormat.format(salary / 10000)); // 만원 단위로 변환하여 설정
             }
+
+            // 현재 번 돈을 화면에 반영
+            updateDailyEarning();
         }
     }
 }
