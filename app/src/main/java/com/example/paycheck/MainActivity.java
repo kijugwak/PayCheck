@@ -211,7 +211,9 @@ public class MainActivity extends AppCompatActivity {
 
         // SharedPreferences에서 저장된 출근 시간과 연봉을 불러옴
         loadPreferences();
-
+        if (salary > 0) {
+            updateHourlyWage();
+        }
         // 현재까지의 수입
         resetDailyEarning(); // 현재까지의 수입 초기화
     }
