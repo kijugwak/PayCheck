@@ -234,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 현재까지의 근무 시간(초)
         double workingTimeInSeconds = (currentHour - startHour) * 3600 + (currentMinute - startMinute) * 60;
+        workingTimeInSeconds = Math.max(0, workingTimeInSeconds); // 음수 근무 시간 방지
 
         // 경과 시간과 근무 시간을 9시간(32400초)으로 제한
         double maxWorkingTimeInSeconds = 9 * 3600.0; // 9시간을 초로 변환
@@ -243,14 +244,15 @@ public class MainActivity extends AppCompatActivity {
         // 출근 시간부터 현재까지의 수입 계산
         double earnedSinceStart = hourlySalary * (elapsedTimeInSeconds / 3600.0);
 
-        // 수입이 음수인 경우를 처리
-        if ((earnedSinceStart + hourlySalary * (workingTimeInSeconds / 3600.0)) < 0) {
+        // 음수 수입 방지
+        if (earnedSinceStart < 0) {
             return 0;
         } else {
             // 출근 시간부터의 수입에 현재까지의 근무 시간 동안의 수입을 추가하여 반환
             return earnedSinceStart + hourlySalary * (workingTimeInSeconds / 3600.0);
         }
     }
+
 
     private void resetDailyEarning() {
         dailyEarning = 0;
