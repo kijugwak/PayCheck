@@ -239,43 +239,32 @@ public class MainActivity extends AppCompatActivity {
     // -----------------------------------------------------
     // 출근 시작 시간을 밀리초 단위로 저장한다.
     private void setStartTime() {
-        startTimeInMillis = Calendar.getInstance().getTimeInMillis();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, startHour);
+        calendar.set(Calendar.MINUTE, startMinute);
+        startTimeInMillis = calendar.getTimeInMillis();
     }
 
     // -----------------------------------------------------
     // 출근 시간부터 현재까지 경과한 시간과 근무 시간을 계산하여 현재까지의 수입을 계산한다.
     private double calculateEarningSinceStartTime() {
         Calendar now = Calendar.getInstance();
-        int currentHour = now.get(Calendar.HOUR_OF_DAY);
-        int currentMinute = now.get(Calendar.MINUTE);
+        long elapsedTimeInMillis = now.getTimeInMillis() - startTimeInMillis;
 
-        // 출근 시간부터 경과한 시간(초)
-        double elapsedTimeInSeconds = (now.getTimeInMillis() - startTimeInMillis) / 1000.0;
-
-        // 현재까지의 근무 시간(초)
-        double workingTimeInSeconds = (currentHour - startHour) * 3600 + (currentMinute - startMinute) * 60;
-        workingTimeInSeconds = Math.max(0, workingTimeInSeconds); // 음수 근무 시간 방지
-
-        // 경과 시간과 근무 시간을 9시간(32400초)으로 제한
-        double maxWorkingTimeInSeconds = 9 * 3600.0; // 9시간을 초로 변환
+        // 경과 시간(초)
+        double elapsedTimeInSeconds = elapsedTimeInMillis / 1000.0;
+        double maxWorkingTimeInSeconds = workHoursPerDay * 3600.0; // 하루 근무 시간(초)로 변환
         elapsedTimeInSeconds = Math.min(elapsedTimeInSeconds, maxWorkingTimeInSeconds);
-        workingTimeInSeconds = Math.min(workingTimeInSeconds, maxWorkingTimeInSeconds);
 
         // 출근 시간부터 현재까지의 수입 계산
         double earnedSinceStart = hourlySalary * (elapsedTimeInSeconds / 3600.0);
 
-        // 음수 수입 방지
-        if (earnedSinceStart < 0) {
-            return 0;
-        } else {
-            // 출근 시간부터의 수입에 현재까지의 근무 시간 동안의 수입을 추가하여 반환
-            return earnedSinceStart + hourlySalary * (workingTimeInSeconds / 3600.0);
-        }
+        return Math.max(0, earnedSinceStart); // 음수 수입 방지
     }
     // -----------------------------------------------------
     // 일일 수입을 초기화하고 화면에 반영한 후, 주기적인 수입 업데이트를 시작한다.
     private void resetDailyEarning() {
-        dailyEarning = 0;
+        dailyEarning = calculateEarningSinceStartTime(); // 출근 시간부터의 수입 재계산
         updateDailyEarning(); // 수입을 초기화 후 바로 화면에 반영
         handler.post(updateEarningRunnable); // Runnable 다시 시작
     }
@@ -306,11 +295,7 @@ public class MainActivity extends AppCompatActivity {
         if (startHour != null && startMinute != null) {
             double earningSinceStartTime = calculateEarningSinceStartTime(); // 출근 시간부터의 수입 계산
             DecimalFormat decimalFormat = new DecimalFormat("#,##0 원");
-            if (editTextSalary != null){
-                formattedDailyEarning = "오늘 번 돈: " + decimalFormat.format(earningSinceStartTime);
-            } else {
-                formattedDailyEarning = "오늘 번 돈: " + 0;
-            }
+            formattedDailyEarning = "오늘 번 돈: " + decimalFormat.format(earningSinceStartTime);
 
             Calendar now = Calendar.getInstance();
 
@@ -324,12 +309,6 @@ public class MainActivity extends AppCompatActivity {
             if (now.compareTo(startCalendar) >= 0) {
                 // 현재 시간이 출근 시간 이후 9시간이 지난 경우 메시지 추가
                 formattedDailyEarning += "\n오늘 하루도 고생했어요!";
-                // 디버깅을 위해 메시지가 추가되는지 확인합니다.
-                System.out.println("오늘 하루도 고생했어요! 메시지가 추가되었습니다.");
-                onStop();
-            } else {
-                // 디버깅을 위해 조건이 맞지 않는 경우를 출력합니다.
-                System.out.println("퇴근 시간이 지나지 않았습니다.");
             }
 
             textViewDailyEarning.setText(formattedDailyEarning);
@@ -338,6 +317,7 @@ public class MainActivity extends AppCompatActivity {
             textViewDailyEarning.setText("오늘 번 돈: 0 원");
         }
     }
+
     // -----------------------------------------------------
     // 출근 시간과 연봉, 시급, 일일 수입을 'SharedPreferences'에 저장한다.
     private void savePreferences() {
@@ -348,6 +328,7 @@ public class MainActivity extends AppCompatActivity {
             editor.putInt("startMinute", startMinute);
             editor.putInt("endHour", endHour);
             editor.putInt("endMinute", endMinute);
+            editor.putLong("startTimeInMillis", startTimeInMillis);
         }
         editor.putFloat("salary", (float) salary);
         editor.putFloat("hourlySalary", (float) hourlySalary);
@@ -365,11 +346,10 @@ public class MainActivity extends AppCompatActivity {
             endMinute = preferences.getInt("endMinute", 0);
             salary = preferences.getFloat("salary", 0);
             hourlySalary = preferences.getFloat("hourlySalary", 0);
-            dailyEarning = preferences.getFloat("dailyEarning", 0);
+            startTimeInMillis = preferences.getLong("startTimeInMillis", 0);
 
             // 저장된 출근 시간이 있으면 출근 시간 버튼에 텍스트 설정
             buttonStartTime.setText(String.format("출근시간 : %02d:%02d", startHour, startMinute));
-            setStartTime(); // 출근 시작 시간 설정
 
             // 시급을 업데이트합니다.
             updateHourlyWage();
@@ -381,9 +361,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // 현재 번 돈을 화면에 반영
-            updateDailyEarning();
+            resetDailyEarning();
             handler.post(updateEarningRunnable); // Runnable 시작
         }
     }
+
 
 }
