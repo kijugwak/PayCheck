@@ -22,38 +22,43 @@ import java.util.Random;
 
 
 public class MainActivity extends AppCompatActivity {
-    EditText editTextSalary;
-    TextView textViewHourlyWage;
-    TextView textViewDailyEarning;
-    Button buttonStartTime;
+    EditText editTextSalary; // 연봉을 입력하는 곳
+    TextView textViewHourlyWage; // 시급을 표시하는
+    TextView textViewDailyEarning; // 일일 수입을 표시
+    Button buttonStartTime; // 출근 시간을 설정하는 button
 
-    private TextView textViewQuote;
-    private Handler handler;
-    private Runnable updateQuoteRunnable;
+    private TextView textViewQuote; // 명언을 표시하는 textview
+    private Handler handler; // 주기적인 작업을 처리하는 handler
+    private Runnable updateQuoteRunnable; // 명언을 주기적으로 업데이트하는 Runnable
 
 
-    double salary = 0;
-    double dailyEarning = 0;
-    double hourlySalary = 0;
-    public String formattedDailyEarning;
+    double salary = 0; // 연봉
+    double dailyEarning = 0; // 일일 수입
+    double hourlySalary = 0; // 시급
+    public String formattedDailyEarning; // 포맷팅된 일일 수입을 저장할 변수를 선언하고 초기화
 
     final double taxRate = 0.033; // 세금 비율 (3.3%)
     final int workDaysPerWeek = 5; // 주당 근무일 수
     final int workHoursPerDay = 9; // 하루 근무 시간
 
+    // 출근 및 퇴근 시간을 저장할 변수를 선언한다. 초기값은 'null'
     Integer startHour = null;
     Integer startMinute = null;
     Integer endHour = null;
     Integer endMinute = null;
 
 //    Handler handler = new Handler();
+    // 여기서는 수입을 주기적으로 업데이트하는 'Runnable'을 정의한다
+    // 현재 시간을 얻어온다.
     Runnable updateEarningRunnable = new Runnable() {
         @Override
         public void run() {
             Calendar now = Calendar.getInstance();
             int currentHour = now.get(Calendar.HOUR_OF_DAY);
             int currentMinute = now.get(Calendar.MINUTE);
-
+    // -----------------------------------------------------
+            // 하단은 출근 시간과 현재 시간을 비교하여 근무 시간 동안 매초 수입을 업데이트한다.
+            // 근무 시간이 끝나면 핸들러를 중지한다.
             if (startHour != null && startMinute != null &&
                     ((currentHour > startHour && currentHour < endHour) ||
                             (currentHour == startHour && currentMinute >= startMinute) ||
@@ -68,9 +73,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+    // -----------------------------------------------------
 
     private long startTimeInMillis = 0; // 출근 시작 시간을 밀리초 단위로 저장
 
+    // 'onCreate' 메서드는 액티비티가 생성될 때 호출된다.
+    // 여기서는 레이아웃을 설정한다.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +86,8 @@ public class MainActivity extends AppCompatActivity {
 
         // 명언을 표시할 TextView 찾기
         textViewQuote = findViewById(R.id.textViewQuote);
-
+        // -----------------------------------------------------
+        // 하단은 'Handler'와 'Runnable'을 초기화하여 명언을 10초마다 업데이트하도록 설정한다.
         // Handler 및 Runnable 초기화
         handler = new Handler();
         Runnable updateQuoteRunnable = new Runnable() {
@@ -97,12 +106,16 @@ public class MainActivity extends AppCompatActivity {
 
         // 첫 번째 명언 업데이트 시작
         handler.post(updateQuoteRunnable);
-
+        // -----------------------------------------------------
+        // 하단에는 각 UI 요소를 찾는다.
         editTextSalary = findViewById(R.id.editTextSalary);
         textViewHourlyWage = findViewById(R.id.textViewHourlyWage);
         textViewDailyEarning = findViewById(R.id.textViewDailyEarning);
         buttonStartTime = findViewById(R.id.buttonStartTime);
-
+        // -----------------------------------------------------
+        // 출근 시간을 설정하는 버튼 클릭 리스너를 정의한다.
+        // 시간 선택 다이얼로그를 띄우고, 선택한 시간에 따라 출근 및 퇴근 시간을 설정한다.
+        // 출근 시간을 설정하면 연봉 입력을 활성화하고, 수입을 초기화하고 시급을 업데이트한다.
         buttonStartTime.setOnClickListener(v -> {
             TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this, (view, hourOfDay, minute) -> {
                 startHour = hourOfDay;
@@ -124,9 +137,11 @@ public class MainActivity extends AppCompatActivity {
             }, startHour != null ? startHour : 0, startMinute != null ? startMinute : 0, true);
             timePickerDialog.show();
         });
-
+        // -----------------------------------------------------
         editTextSalary.setEnabled(false); // 초기에는 연봉 입력 비활성화
-
+        // -----------------------------------------------------
+        // 여기서는 연봉 입력란에 대한 'TextWatcher'를 정의한다.
+        // 연봉이 변경될 때마다 시급과 일일 수입을 업데이트한다.
         editTextSalary.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -158,22 +173,22 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
+        // -----------------------------------------------------
         // 액티비티가 화면에 보여질 때 SharedPreferences에서 저장된 출근 시간과 연봉을 불러옴
         loadPreferences();
 
         // 현재까지의 수입
         resetDailyEarning(); // 현재까지의 수입 초기화
     }
-
-
+    // -----------------------------------------------------
     @Override
     protected void onDestroy() {
         super.onDestroy();
         // 액티비티가 종료될 때 Handler의 작업을 중지
         handler.removeCallbacks(updateQuoteRunnable);
     }
-
+    // -----------------------------------------------------
+    // 'MoneyQuote' enum에서 랜덤한 명언을 선택하여 'TextView'에 설정한다.
     private void updateQuote() {
         // MoneyQuote enum에서 랜덤한 명언 선택
         MoneyQuote[] quotes = MoneyQuote.values();
@@ -182,8 +197,9 @@ public class MainActivity extends AppCompatActivity {
         // 선택된 명언을 TextView에 설정
         textViewQuote.setText(randomQuote.getQuote());
     }
-
-
+    // -----------------------------------------------------
+    // 액티비티가 다시 화면에 보일 때('onResume')와 사라질때('onPause')
+    // 'SharedPreferences'에서 데이터를 불러오고 저장한다.
     @Override
     protected void onResume() {
         super.onResume();
@@ -204,7 +220,8 @@ public class MainActivity extends AppCompatActivity {
         // SharedPreferences에 출근 시간과 연봉을 저장
         savePreferences();
     }
-
+    // -----------------------------------------------------
+    // 여기서는 'AlarmManager'를 사용하여 30초마다 알림을 예약한다.
     private void scheduleNotification() {
         // AlarmManager를 사용하여 30초마다 알림 예약
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -219,11 +236,14 @@ public class MainActivity extends AppCompatActivity {
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), intervalMillis, pendingIntent);
         }
     }
-
+    // -----------------------------------------------------
+    // 출근 시작 시간을 밀리초 단위로 저장한다.
     private void setStartTime() {
         startTimeInMillis = Calendar.getInstance().getTimeInMillis();
     }
 
+    // -----------------------------------------------------
+    // 출근 시간부터 현재까지 경과한 시간과 근무 시간을 계산하여 현재까지의 수입을 계산한다.
     private double calculateEarningSinceStartTime() {
         Calendar now = Calendar.getInstance();
         int currentHour = now.get(Calendar.HOUR_OF_DAY);
@@ -252,14 +272,16 @@ public class MainActivity extends AppCompatActivity {
             return earnedSinceStart + hourlySalary * (workingTimeInSeconds / 3600.0);
         }
     }
-
-
+    // -----------------------------------------------------
+    // 일일 수입을 초기화하고 화면에 반영한 후, 주기적인 수입 업데이트를 시작한다.
     private void resetDailyEarning() {
         dailyEarning = 0;
         updateDailyEarning(); // 수입을 초기화 후 바로 화면에 반영
         handler.post(updateEarningRunnable); // Runnable 다시 시작
     }
-
+    // -----------------------------------------------------
+    // 연봉을 기반으로 세후 시급을 계산하고, 이를 포맷팅하여 'TextView'에 표시한다.
+    // 또한 현재 번 돈을 업데이트한다.
     private void updateHourlyWage() {
         double annualSalaryAfterTax = salary * (1 - taxRate); // 세후 연봉
         double monthlySalary = annualSalaryAfterTax / 12; // 세후 월급
@@ -276,6 +298,9 @@ public class MainActivity extends AppCompatActivity {
         // 현재 번 돈을 업데이트
         updateDailyEarning();
     }
+    // -----------------------------------------------------
+    // 출근 시간부터 현재까지 번 돈을 계산하고 이를 'TextView'에 업데이트한다.
+    // 퇴근 시간이 지난 경우 '오늘 하루도 고생했어요!' 메시지를 추가한다.
 
     private void updateDailyEarning() {
         if (startHour != null && startMinute != null) {
@@ -313,8 +338,8 @@ public class MainActivity extends AppCompatActivity {
             textViewDailyEarning.setText("오늘 번 돈: 0 원");
         }
     }
-
-
+    // -----------------------------------------------------
+    // 출근 시간과 연봉, 시급, 일일 수입을 'SharedPreferences'에 저장한다.
     private void savePreferences() {
         SharedPreferences preferences = getSharedPreferences("work_preferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -329,7 +354,8 @@ public class MainActivity extends AppCompatActivity {
         editor.putFloat("dailyEarning", (float) dailyEarning);
         editor.apply();
     }
-
+    // -----------------------------------------------------
+    // 'SharedPreferences' 에서 저장된 출근 시간과 연봉, 시급, 일일 수입을 불러온다.
     private void loadPreferences() {
         SharedPreferences preferences = getSharedPreferences("work_preferences", MODE_PRIVATE);
         if (preferences.contains("startHour") && preferences.contains("startMinute")) {
