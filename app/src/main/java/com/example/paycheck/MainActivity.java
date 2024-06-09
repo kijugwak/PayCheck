@@ -161,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         salary = Double.parseDouble(s.toString()) * 10000; // 만원 단위 입력을 원 단위로 변환
                         updateHourlyWage();
+                        savePreferences(); // 연봉을 변경할 때마다 저장
                     }
                 } catch (NumberFormatException e) {
                     salary = 0;
@@ -360,9 +361,12 @@ public class MainActivity extends AppCompatActivity {
             buttonStartTime.setText(String.format("출근시간 : %02d:%02d", startHour, startMinute));
 
             DecimalFormat decimalFormat = new DecimalFormat("#,##0 원");
-            // 연봉이 저장되어 있는 경우 입력 칸에 설정
-            if (salary > 0) {
-                editTextSalary.setText(decimalFormat.format(salary / 10000)); // 만원 단위로 변환하여 설정
+//            // 연봉이 저장되어 있는 경우 입력 칸에 설정
+//            if (salary > 0) {
+//                editTextSalary.setText(decimalFormat.format(salary / 10000)); // 만원 단위로 변환하여 설정
+//            }
+            if (salary != 0) {
+                editTextSalary.setText(String.valueOf((int) (salary / 10000))); // 만원 단위로 표시
             }
             String formattedHourlyWage = "시급: " + decimalFormat.format(hourlySalary);
             textViewHourlyWage.setText(formattedHourlyWage);
