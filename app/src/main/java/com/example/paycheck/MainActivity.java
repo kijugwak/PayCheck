@@ -122,12 +122,13 @@ public class MainActivity extends AppCompatActivity {
                 startMinute = minute;
                 endHour = startHour + workHoursPerDay;
                 endMinute = startMinute;
-
                 setStartTime(); // 출근 시작 시간 설정
                 editTextSalary.setEnabled(true); // 연봉 입력 활성화
+                editTextSalary.setText("");
                 editTextSalary.requestFocus(); // 연봉 입력으로 포커스 이동
 
                 // 출근 시간이 변경되었으므로 현재까지의 수입을 초기화하고 다시 계산
+
                 resetDailyEarning();
                 updateHourlyWage(); // 시급 업데이트
                 handler.post(updateEarningRunnable); // Runnable 시작
@@ -351,15 +352,16 @@ public class MainActivity extends AppCompatActivity {
             // 저장된 출근 시간이 있으면 출근 시간 버튼에 텍스트 설정
             buttonStartTime.setText(String.format("출근시간 : %02d:%02d", startHour, startMinute));
 
-            // 시급을 업데이트합니다.
-            updateHourlyWage();
-
+            DecimalFormat decimalFormat = new DecimalFormat("#,##0 원");
+            String formattedHourlyWage = "시급: " + decimalFormat.format(hourlySalary);
             // 연봉이 저장되어 있는 경우 입력 칸에 설정
             if (salary > 0) {
-                DecimalFormat decimalFormat = new DecimalFormat("#,##0");
                 editTextSalary.setText(decimalFormat.format(salary / 10000)); // 만원 단위로 변환하여 설정
             }
+            textViewHourlyWage.setText(formattedHourlyWage);
 
+            // 현재 번 돈을 업데이트
+            updateDailyEarning();
             // 현재 번 돈을 화면에 반영
             resetDailyEarning();
             handler.post(updateEarningRunnable); // Runnable 시작
