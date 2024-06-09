@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -124,10 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 endMinute = startMinute;
                 setStartTime(); // 출근 시작 시간 설정
                 editTextSalary.setEnabled(true); // 연봉 입력 활성화
-                editTextSalary.setText("");
                 editTextSalary.requestFocus(); // 연봉 입력으로 포커스 이동
-
-                // 출근 시간이 변경되었으므로 현재까지의 수입을 초기화하고 다시 계산
 
                 resetDailyEarning();
                 updateHourlyWage(); // 시급 업데이트
@@ -335,6 +333,10 @@ public class MainActivity extends AppCompatActivity {
         editor.putFloat("hourlySalary", (float) hourlySalary);
         editor.putFloat("dailyEarning", (float) dailyEarning);
         editor.apply();
+
+        Log.d("Preferences", "Saved salary: " + salary);
+        Log.d("Preferences", "Saved hourlySalary: " + hourlySalary);
+        Log.d("Preferences", "Saved dailyEarning: " + dailyEarning);
     }
     // -----------------------------------------------------
     // 'SharedPreferences' 에서 저장된 출근 시간과 연봉, 시급, 일일 수입을 불러온다.
@@ -348,18 +350,22 @@ public class MainActivity extends AppCompatActivity {
             salary = preferences.getFloat("salary", 0);
             hourlySalary = preferences.getFloat("hourlySalary", 0);
             startTimeInMillis = preferences.getLong("startTimeInMillis", 0);
+            dailyEarning = preferences.getFloat("dailyEarning", 0);
+
+            Log.d("Preferences", "Loaded salary: " + salary);
+            Log.d("Preferences", "Loaded hourlySalary: " + hourlySalary);
+            Log.d("Preferences", "Loaded dailyEarning: " + dailyEarning);
 
             // 저장된 출근 시간이 있으면 출근 시간 버튼에 텍스트 설정
             buttonStartTime.setText(String.format("출근시간 : %02d:%02d", startHour, startMinute));
 
             DecimalFormat decimalFormat = new DecimalFormat("#,##0 원");
-            String formattedHourlyWage = "시급: " + decimalFormat.format(hourlySalary);
             // 연봉이 저장되어 있는 경우 입력 칸에 설정
             if (salary > 0) {
                 editTextSalary.setText(decimalFormat.format(salary / 10000)); // 만원 단위로 변환하여 설정
             }
+            String formattedHourlyWage = "시급: " + decimalFormat.format(hourlySalary);
             textViewHourlyWage.setText(formattedHourlyWage);
-
             // 현재 번 돈을 업데이트
             updateDailyEarning();
             // 현재 번 돈을 화면에 반영
@@ -367,6 +373,4 @@ public class MainActivity extends AppCompatActivity {
             handler.post(updateEarningRunnable); // Runnable 시작
         }
     }
-
-
 }
