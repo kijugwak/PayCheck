@@ -118,22 +118,28 @@ public class MainActivity extends AppCompatActivity {
         // 시간 선택 다이얼로그를 띄우고, 선택한 시간에 따라 출근 및 퇴근 시간을 설정한다.
         // 출근 시간을 설정하면 연봉 입력을 활성화하고, 수입을 초기화하고 시급을 업데이트한다.
         buttonStartTime.setOnClickListener(v -> {
-            TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this, (view, hourOfDay, minute) -> {
-                startHour = hourOfDay;
-                startMinute = minute;
-                endHour = startHour + workHoursPerDay;
-                endMinute = startMinute;
-                setStartTime(); // 출근 시작 시간 설정
-                editTextSalary.setEnabled(true); // 연봉 입력 활성화
-                editTextSalary.requestFocus(); // 연봉 입력으로 포커스 이동
+            TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this,
+//                    R.style.CustomTimePickerDialogTheme, // 커스텀 테마 적용
+                    (view, hourOfDay, minute) -> {
+                        startHour = hourOfDay;
+                        startMinute = minute;
+                        endHour = startHour + workHoursPerDay;
+                        endMinute = startMinute;
+                        setStartTime(); // 출근 시작 시간 설정
+                        editTextSalary.setEnabled(true); // 연봉 입력 활성화
+                        editTextSalary.requestFocus(); // 연봉 입력으로 포커스 이동
 
-                resetDailyEarning();
-                updateHourlyWage(); // 시급 업데이트
-                handler.post(updateEarningRunnable); // Runnable 시작
+                        resetDailyEarning();
+                        updateHourlyWage(); // 시급 업데이트
+                        handler.post(updateEarningRunnable); // Runnable 시작
 
-                // 출근 시간 버튼 텍스트 업데이트
-                buttonStartTime.setText(String.format("출근시간 : %02d:%02d", startHour, startMinute));
-            }, startHour != null ? startHour : 0, startMinute != null ? startMinute : 0, true);
+                        // 출근 시간 버튼 텍스트 업데이트
+                        buttonStartTime.setText(String.format("출근시간 : %02d:%02d", startHour, startMinute));
+                    },
+                    startHour != null ? startHour : 0,
+                    startMinute != null ? startMinute : 0,
+                    true
+            );
             timePickerDialog.show();
         });
         // -----------------------------------------------------
