@@ -13,6 +13,10 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.util.Log;
+//import android.app.NotificationChannel;
+//import android.app.NotificationManager;
+//import android.os.Build;
+
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -27,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     TextView textViewHourlyWage; // 시급을 표시하는
     TextView textViewDailyEarning; // 일일 수입을 표시
     Button buttonStartTime; // 출근 시간을 설정하는 button
+//    Button buttonTestNotification; // 알림 테스트 버튼
 
     private TextView textViewQuote; // 명언을 표시하는 textview
     private Handler handler; // 주기적인 작업을 처리하는 handler
@@ -84,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        createNotificationChannel();
 
         // 명언을 표시할 TextView 찾기
         textViewQuote = findViewById(R.id.textViewQuote);
@@ -113,6 +119,8 @@ public class MainActivity extends AppCompatActivity {
         textViewHourlyWage = findViewById(R.id.textViewHourlyWage);
         textViewDailyEarning = findViewById(R.id.textViewDailyEarning);
         buttonStartTime = findViewById(R.id.buttonStartTime);
+//        buttonTestNotification = findViewById(R.id.buttonTestNotification); // 알림 테스트 버튼
+//        scheduleNotification();
         // -----------------------------------------------------
         // 출근 시간을 설정하는 버튼 클릭 리스너를 정의한다.
         // 시간 선택 다이얼로그를 띄우고, 선택한 시간에 따라 출근 및 퇴근 시간을 설정한다.
@@ -229,19 +237,17 @@ public class MainActivity extends AppCompatActivity {
     // -----------------------------------------------------
     // 여기서는 'AlarmManager'를 사용하여 30초마다 알림을 예약한다.
     private void scheduleNotification() {
-        // AlarmManager를 사용하여 30초마다 알림 예약
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        long intervalMillis = 30 * 1000; // 30초 간격 (밀리초 단위)
-
-        // 알림을 위한 PendingIntent 생성
+        // 알림 예약을 위한 메소드
         Intent intent = new Intent(this, NotificationReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE); // 플래그 추가
 
-        // AlarmManager를 사용하여 30초 간격으로 알림 예약
-        if (alarmManager != null) {
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), intervalMillis, pendingIntent);
-        }
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        // 5초 후에 알림 트리거 (테스트용)
+        long triggerTime = System.currentTimeMillis() + 5000;
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
     }
+
     // -----------------------------------------------------
     // 출근 시작 시간을 밀리초 단위로 저장한다.
     private void setStartTime() {
@@ -383,4 +389,23 @@ public class MainActivity extends AppCompatActivity {
             handler.post(updateEarningRunnable); // Runnable 시작
         }
     }
+    // 알림 채널 생성 메소드
+//    private void createNotificationChannel() {
+//        // Android 버전이 Oreo(API 레벨 26) 이상인지 확인
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            CharSequence name = "MyNotificationChannel";
+//            String description = "Channel description";
+//            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+//            NotificationChannel channel = new NotificationChannel("my_channel_id", name, importance);
+//            channel.setDescription(description);
+//
+//            // NotificationManager를 통해 채널 등록
+//            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+//            notificationManager.createNotificationChannel(channel);
+//
+//            // 로그 추가
+//            Log.d("Notification", "Notification channel created successfully.");
+//        }
+//    }
+
 }

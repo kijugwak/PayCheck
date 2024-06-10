@@ -99,6 +99,19 @@
             android:layout_marginBottom="6dp"
             android:layout_marginEnd="16dp" />
 
+<!--        <Button-->
+<!--            android:id="@+id/buttonTestNotification"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="404dp"-->
+<!--            android:backgroundTint="@color/black"-->
+<!--            android:text="알림 설정"-->
+<!--            android:textColor="@color/white"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintHorizontal_bias="0.501"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/editTextSalary" />-->
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
