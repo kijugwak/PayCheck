@@ -292,10 +292,13 @@ public class MainActivity extends AppCompatActivity {
 
         // 시급을 원으로 포맷팅
         DecimalFormat decimalFormat = new DecimalFormat("#,##0 원");
-        String formattedHourlyWage = "시급: " + decimalFormat.format(hourlySalary);
-
-        textViewHourlyWage.setText(formattedHourlyWage);
-
+        if (editTextSalary.getText().toString().isEmpty()){
+            String formattedHourlyWage = "시급: " + decimalFormat.format(0);
+            textViewHourlyWage.setText(formattedHourlyWage);
+        } else {
+            String formattedHourlyWage = "시급: " + decimalFormat.format(hourlySalary);
+            textViewHourlyWage.setText(formattedHourlyWage);
+        }
         // 현재 번 돈을 업데이트
         updateDailyEarning();
     }
@@ -307,7 +310,17 @@ public class MainActivity extends AppCompatActivity {
         if (startHour != null && startMinute != null) {
             double earningSinceStartTime = calculateEarningSinceStartTime(); // 출근 시간부터의 수입 계산
             DecimalFormat decimalFormat = new DecimalFormat("#,##0 원");
-            formattedDailyEarning = "오늘 번 돈: " + decimalFormat.format(earningSinceStartTime);
+            if (editTextSalary.getText().toString().isEmpty()){
+                formattedDailyEarning = "오늘 번 돈 : " + decimalFormat.format(0);
+                String formattedHourlyWage = "시급: " + decimalFormat.format(0);
+                textViewHourlyWage.setText(formattedHourlyWage);
+                Log.d("TAG", "editTextSalary" + editTextSalary.getText());
+            } else{
+                formattedDailyEarning = "오늘 번 돈 : " + decimalFormat.format(earningSinceStartTime);
+                Log.d("TAG", "editTextSalary" + editTextSalary.getText() + "0이상");
+
+            }
+
 
             Calendar now = Calendar.getInstance();
 
