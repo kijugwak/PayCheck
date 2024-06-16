@@ -314,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("TAG", "editTextSalary" + editTextSalary.getText());
             } else{
                 formattedDailyEarning = "오늘 번 돈 : " + decimalFormat.format(earningSinceStartTime);
-                Log.d("TAG", "editTextSalary" + editTextSalary.getText() + "0이상");
+                Log.d("TAG", "editTextSalary" + editTextSalary.getText() + "이다.");
 
             }
 
