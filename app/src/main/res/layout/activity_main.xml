@@ -106,15 +106,9 @@
             android:background="@android:color/transparent"
             android:elevation="4dp"
             android:scaleType="fitCenter"
+            android:contentDescription="@string/menu_button_desc"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/menu_icon" />  <!-- 크기 조정 -->
-            android:contentDescription="@string/menu_button_desc" /> <!-- 접근성 추가 -->
-
-
+            app:srcCompat="@drawable/menu_icon" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- 메뉴 버튼 추가 -->
-
-
 </RelativeLayout>

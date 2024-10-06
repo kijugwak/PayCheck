@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">PayCheck</string>
+    <string name="menu_button_desc">메뉴 버튼</string>
     <string name="splash_logo_description">앱의 로고</string>
 </resources>
