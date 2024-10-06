@@ -13,6 +13,12 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.ImageButton;
+import android.view.View;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.widget.Toast;
+
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -90,6 +96,15 @@ public class MainActivity extends AppCompatActivity {
 
         // 명언을 표시할 TextView 찾기
         textViewQuote = findViewById(R.id.textViewQuote);
+        ImageButton menuButton = findViewById(R.id.menuButton);
+
+        menuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 여기에서 버튼 클릭 시 수행할 작업을 정의합니다.
+                openMenu(); // 메뉴 열기 메소드 호출
+            }
+        });
         // -----------------------------------------------------
         // 하단은 'Handler'와 'Runnable'을 초기화하여 명언을 10초마다 업데이트하도록 설정한다.
         // Handler 및 Runnable 초기화
@@ -399,23 +414,22 @@ public class MainActivity extends AppCompatActivity {
             handler.post(updateEarningRunnable); // Runnable 시작
         }
     }
-    // 알림 채널 생성 메소드
-//    private void createNotificationChannel() {
-//        // Android 버전이 Oreo(API 레벨 26) 이상인지 확인
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            CharSequence name = "MyNotificationChannel";
-//            String description = "Channel description";
-//            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-//            NotificationChannel channel = new NotificationChannel("my_channel_id", name, importance);
-//            channel.setDescription(description);
-//
-//            // NotificationManager를 통해 채널 등록
-//            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-//            notificationManager.createNotificationChannel(channel);
-//
-//            // 로그 추가
-//            Log.d("Notification", "Notification channel created successfully.");
-//        }
-//    }
+    private void openMenu() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Menu")
+                .setItems(new String[]{"Calendar", "How Make Money", "How Spend Money"}, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 클릭된 항목에 따라 작업 수행
+                        Toast.makeText(MainActivity.this, "Select Item: " + which, Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.create().show();
+    }
 
 }
